@@ -1,0 +1,20 @@
+name: Block Direct Push to Main
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  block-direct-push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fail if push is not a merge commit
+        run: |
+          PARENT_COUNT=$(git rev-list --parents -n 1 HEAD | wc -w)
+          if [ "$PARENT_COUNT" -le 2 ]; then
+            echo "Direct pushes to main are not allowed. Use a pull request to merge changes."
+            exit 1
+          fi
